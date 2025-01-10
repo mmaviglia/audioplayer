@@ -2,6 +2,7 @@ package audioplayer
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os/exec"
@@ -67,7 +68,7 @@ func (ap *AudioPlayer) Start() error {
 
 	ffmpegOut, err := ffmpegCmd.StdoutPipe()
 	if err != nil {
-		return err
+		return fmt.Errorf("create FFmpeg stdout pipe: %w", err)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -75,7 +76,7 @@ func (ap *AudioPlayer) Start() error {
 	reader := NewReader(ctx, ffmpegOut)
 
 	if err := ffmpegCmd.Start(); err != nil {
-		return err
+		return fmt.Errorf("start FFmpeg cmd: %w", err)
 	}
 
 	// Create Oto context and player if not already initialized
@@ -84,7 +85,7 @@ func (ap *AudioPlayer) Start() error {
 
 		context, err := oto.NewContext(44100, 2, 2, bufferSizeInBytes)
 		if err != nil {
-			log.Fatalf("Failed to create Oto context: %v", err)
+			return fmt.Errorf("create oto context: %w", err)
 		}
 		ap.context = context
 	}
