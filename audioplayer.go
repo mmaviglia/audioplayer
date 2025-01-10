@@ -11,6 +11,14 @@ import (
 	"github.com/hajimehoshi/oto"
 )
 
+var ffmpegPath string = "ffmpeg"
+
+// SetFFmpegPath sets the path to the FFmpeg executable. This should be used if FFmpeg is not
+// in the system PATH.
+func SetFFmpegPath(path string) {
+	ffmpegPath = path
+}
+
 type AudioPlayer struct {
 	mu sync.Mutex
 	wg sync.WaitGroup
@@ -44,8 +52,6 @@ func (ap *AudioPlayer) Start() error {
 		ap.Close()
 		ap.mu.Lock()
 	}
-
-	ffmpegPath := "./tools/ffmpeg" // TODO: Replace with config path
 
 	// FFmpeg command to decode audio into raw PCM
 	ffmpegCmd := exec.Command(
@@ -137,6 +143,7 @@ type readerCtx struct {
 	r   io.Reader
 }
 
+// Read is the Read method of the io.Reader interface.
 func (r *readerCtx) Read(p []byte) (n int, err error) {
 	if err := r.ctx.Err(); err != nil {
 		return 0, err
@@ -144,7 +151,7 @@ func (r *readerCtx) Read(p []byte) (n int, err error) {
 	return r.r.Read(p)
 }
 
-// NewReader gets a context-aware io.Reader.
+// NewReader returns a context-aware io.Reader.
 func NewReader(ctx context.Context, r io.Reader) io.Reader {
 	return &readerCtx{ctx: ctx, r: r}
 }
