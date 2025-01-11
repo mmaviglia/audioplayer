@@ -1,6 +1,6 @@
 # AudioPlayer
 
-`audioplayer` is a simple golang package providing basic audio functionality for various audio file types by using FFmpeg.
+`audioplayer` is a simple golang package providing basic audio functionality for various audio file types.
 
 ## Dependencies
 
